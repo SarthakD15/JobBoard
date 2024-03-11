@@ -1,5 +1,6 @@
 package com.jobapplication.example.jobapplication.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jobapplication.example.jobapplication.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,11 +22,22 @@ public class UserEntity {
     private String username;
 
     private String password;
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Roles> roles = new ArrayList<>();
+
+    @OneToOne(mappedBy = "userEntity")
+//    @JsonIgnoreProperties("userEntity")
+    private Company company;
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
 
     public int getId() {
         return id;

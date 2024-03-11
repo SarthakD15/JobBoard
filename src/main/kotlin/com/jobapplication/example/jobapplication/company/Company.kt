@@ -25,6 +25,9 @@ data class Company (
     @JsonIgnoreProperties("company")
     var reviews: MutableList<Review>?=null
 //    constructor():this("","","",null){}
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    var userEntity:UserEntity?=null
 
     fun toDTO(): CompanyDto {
         return CompanyDto(

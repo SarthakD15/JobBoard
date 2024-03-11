@@ -40,4 +40,22 @@ data class Job (
                 application = application?.map { ApplicationDto(id = it.id, name = it.name, edu = it.edu, coverLetter = it.coverLetter, status = it.status) }
         )
     }
+    fun toDTOForApplication(): JobDto {
+        return JobDto(
+                id = id,
+                title = title
+        )
+    }
+
+    fun toDTOForJob(): JobDto{
+        return JobDto(
+                id = id,
+                title = title,
+                description = description,
+                minSalary =minSalary,
+                maxSalary =maxSalary,
+                location =location,
+                company = company?.let { CompanyDto(id = it.id, title = it.title) },
+        )
+    }
 }

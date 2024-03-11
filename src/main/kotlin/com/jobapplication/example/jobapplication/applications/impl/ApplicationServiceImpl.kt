@@ -4,15 +4,36 @@ import com.jobapplication.example.jobapplication.applications.Application
 import com.jobapplication.example.jobapplication.applications.ApplicationDto
 import com.jobapplication.example.jobapplication.applications.ApplicationRepository
 import com.jobapplication.example.jobapplication.applications.ApplicationService
+import com.jobapplication.example.jobapplication.company.Company
+import com.jobapplication.example.jobapplication.company.CompanyRepository
+import com.jobapplication.example.jobapplication.security.UserEntity
 import com.jobapplication.example.jobapplication.security.UserRepository
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, var userRepository: UserRepository):ApplicationService {
-    override fun getAllApplications(cid:String, jid:String): List<ApplicationDto> {
-        return applicationRepository.findAll().filter { it.job?.company?.id == cid && it.job?.id == jid }.map { it.toDTO() }
+class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, var userRepository: UserRepository, var companyRepository: CompanyRepository):ApplicationService {
+    override fun getAllApplications(cid:String, jid:String): ResponseEntity<List<ApplicationDto>> {
+        var companypassed : Company = companyRepository.findById(cid).orElseThrow{RuntimeException("Company Not found")}
+        var userID = companypassed.userEntity?.id
+        println(userID)
+
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+        println(completeuser.id)
+        if(userID == completeuser.id) {
+            return ResponseEntity.status(HttpStatus.OK).body(applicationRepository.findAll().filter { it.job?.company?.id == cid && it.job?.id == jid }.map { it.toDTO() })
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null)
+        }
     }
 
     override fun createApplication(cid: String,id:String, application: Application) {

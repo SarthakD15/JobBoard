@@ -14,11 +14,11 @@ data class JobDto(
         @JsonInclude(JsonInclude.Include.NON_NULL)
         var description: String?=null,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var minSalary: String?,
+        var minSalary: String?=null,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var maxSalary: String?,
+        var maxSalary: String?=null,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var location: String?,
+        var location: String?=null,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         var company: CompanyDto?=null,
         @JsonInclude(JsonInclude.Include.NON_NULL)

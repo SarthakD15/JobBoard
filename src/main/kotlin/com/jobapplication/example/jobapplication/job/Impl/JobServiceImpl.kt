@@ -12,7 +12,7 @@ import java.util.*
 @Service
 class JobServiceImpl (var jobRepository: JobRepository, var companyRepository: CompanyRepository): JobService {
     override fun findAll(): List<JobDto> {
-        return jobRepository.findAll().map { it.toDTO() }
+        return jobRepository.findAll().map { it.toDTOForJob() }
     }
 
     override fun createJob(id:String, job: Job) {

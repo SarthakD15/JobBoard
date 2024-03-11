@@ -28,7 +28,7 @@ data class Application (
                 edu = edu,
                 coverLetter = coverLetter,
                 status = status,
-                job = job?.toDTO(),
+                job = job?.toDTOForApplication(),
                 company = job?.company?.toDTOForApplication()
 //                reviews = reviews?.map { ReviewDto(id = it.id, title = it.title, description=it.description, rating = it.rating) }
         )

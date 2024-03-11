@@ -4,12 +4,20 @@ import com.jobapplication.example.jobapplication.company.Company
 import com.jobapplication.example.jobapplication.company.CompanyDto
 import com.jobapplication.example.jobapplication.company.CompanyRepository
 import com.jobapplication.example.jobapplication.company.CompanyService
+import com.jobapplication.example.jobapplication.security.CustomUserDetailsService
+import com.jobapplication.example.jobapplication.security.UserEntity
+import com.jobapplication.example.jobapplication.security.UserRepository
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
-import java.util.stream.Collectors
+
 
 @Service
-class CompanyServiceImpl(var companyRepository: CompanyRepository):CompanyService{
+class CompanyServiceImpl(var companyRepository: CompanyRepository,var userRepository: UserRepository, var customUserDetailsService: CustomUserDetailsService):CompanyService{
     override fun getAllCompanies(): List<CompanyDto> {
         return companyRepository.findAll().map { it.toDTO() }
     }
@@ -26,9 +34,25 @@ class CompanyServiceImpl(var companyRepository: CompanyRepository):CompanyServic
 //        return companyDto
 //    }
 
-    override fun createCompany(company: Company) {
+    override fun createCompany(company: Company) : ResponseEntity<String>{
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+        println(completeuser)
+        if(completeuser.company!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already has a company. Cannot create another.")
+        }
         company.id= UUID.randomUUID().toString()
+        userRepository.save(completeuser)
         companyRepository.save(company)
+
+        completeuser.company = company
+        company.userEntity = completeuser
+
+        companyRepository.save(company)
+        userRepository.save(completeuser)
+        return ResponseEntity.status(HttpStatus.OK).body("Company created")
     }
 
     override fun updateCompany(company: Company, id: String) {
