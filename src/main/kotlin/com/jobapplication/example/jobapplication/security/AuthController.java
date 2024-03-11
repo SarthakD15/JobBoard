@@ -1,5 +1,7 @@
 package com.jobapplication.example.jobapplication.security;
 
+import com.jobapplication.example.jobapplication.email.EmailDetails;
+import com.jobapplication.example.jobapplication.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.HttpStatus;
@@ -27,14 +29,17 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     private JWTGenerator jwtGenerator;
 
+    private EmailService emailService;
+
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator, EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -53,14 +58,17 @@ public class AuthController {
         }
         UserEntity user = new UserEntity();
         user.setUsername(registerDto.getUsername());
+        user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode((registerDto.getPassword())));
         String role = registerDto.getRoles().getFirst().getName();
 
         Roles roles = roleRepository.findByName(role).get();
         user.setRoles(Collections.singletonList(roles));
-
+        System.out.println(user);
         userRepository.save(user);
-
+        EmailDetails emailDetails = new EmailDetails(registerDto.getEmail(),"Registration confirmation","Thanks for registering");
+        System.out.println(emailDetails);
+        emailService.sendSimpleMail(emailDetails);
         return new ResponseEntity<>("User registered success",HttpStatus.OK);
     }
 }

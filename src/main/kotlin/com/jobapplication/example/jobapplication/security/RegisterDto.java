@@ -7,6 +7,16 @@ import java.util.List;
 @Data
 public class RegisterDto {
     private String username;
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     private String password;
     private List<Roles> roles = new ArrayList<>();
 

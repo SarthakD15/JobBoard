@@ -6,9 +6,10 @@ import com.jobapplication.example.jobapplication.applications.ApplicationReposit
 import com.jobapplication.example.jobapplication.applications.ApplicationService
 import com.jobapplication.example.jobapplication.company.Company
 import com.jobapplication.example.jobapplication.company.CompanyRepository
+import com.jobapplication.example.jobapplication.email.EmailDetails
+import com.jobapplication.example.jobapplication.email.EmailService
 import com.jobapplication.example.jobapplication.security.UserEntity
 import com.jobapplication.example.jobapplication.security.UserRepository
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, var userRepository: UserRepository, var companyRepository: CompanyRepository):ApplicationService {
+class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, var userRepository: UserRepository, var companyRepository: CompanyRepository,var emailService: EmailService):ApplicationService {
     override fun getAllApplications(cid:String, jid:String): ResponseEntity<List<ApplicationDto>> {
         var companypassed : Company = companyRepository.findById(cid).orElseThrow{RuntimeException("Company Not found")}
         var userID = companypassed.userEntity?.id
@@ -39,6 +40,14 @@ class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, v
     override fun createApplication(cid: String,id:String, application: Application) {
         application.id= UUID.randomUUID().toString()
         applicationRepository.save(application)
+
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+        println(completeuser)
+
+        val emailDetails = EmailDetails(completeuser.email, "Application received", "Thank you for showing interest. Our hiring manager will review your application and get back to you. All the best!!")
+        emailService.sendSimpleMail(emailDetails)
     }
 
     override fun updateApplication(cid: String, jid: String, aid: String, application: Application) {
@@ -63,6 +72,14 @@ class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, v
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         oldApplication.status=true
         applicationRepository.save(oldApplication)
+
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+        println(completeuser)
+
+        val emailDetails = EmailDetails(completeuser.email, "Application approved", "Congrats")
+        emailService.sendSimpleMail(emailDetails)
         return "Application Accepted"
     }
 
@@ -70,6 +87,13 @@ class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, v
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         oldApplication.status=false
         applicationRepository.save(oldApplication)
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+        println(completeuser)
+
+        val emailDetails = EmailDetails(completeuser.email, "Application rejected", "Sorry")
+        emailService.sendSimpleMail(emailDetails)
         return "Application Rejected"
     }
 

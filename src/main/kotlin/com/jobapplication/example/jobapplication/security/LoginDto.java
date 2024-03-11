@@ -8,6 +8,16 @@ import java.util.List;
 public class LoginDto {
     private String id;
     private String username;
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     private String password;
 
     public String getId() {
