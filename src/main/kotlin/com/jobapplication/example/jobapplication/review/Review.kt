@@ -1,7 +1,10 @@
 package com.jobapplication.example.jobapplication.review
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.jobapplication.example.jobapplication.applications.ApplicationDto
 import com.jobapplication.example.jobapplication.company.Company
+import com.jobapplication.example.jobapplication.company.CompanyDto
+import com.jobapplication.example.jobapplication.job.JobDto
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -20,4 +23,14 @@ data class Review (
         @ManyToOne()
         @JoinColumn(name = "company_id")
         var company: Company?=null
+
+        fun toDTOForCompany(): ReviewDto {
+                return ReviewDto(
+                        id = id,
+                        title = title,
+                        description = description,
+                        rating = rating,
+                        company = company?.let { CompanyDto(id = it.id, title = it.title) }
+                )
+        }
 }

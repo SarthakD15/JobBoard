@@ -37,17 +37,18 @@ class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, v
         }
     }
 
-    override fun createApplication(cid: String,id:String, application: Application) {
+    override fun createApplication(cid: String,id:String, application: Application) :ResponseEntity<String> {
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+
         application.id= UUID.randomUUID().toString()
         applicationRepository.save(application)
 
-        val authentication: Authentication = SecurityContextHolder.getContext().authentication
-        val username = authentication.name
-        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
-        println(completeuser)
-
-        val emailDetails = EmailDetails(completeuser.email, "Application received", "Thank you for showing interest. Our hiring manager will review your application and get back to you. All the best!!")
+        val emailDetails = EmailDetails(completeuser.email, "Thank you for applying", "We have received your application")
         emailService.sendSimpleMail(emailDetails)
+        return ResponseEntity.status(HttpStatus.OK).body("Application sent")
     }
 
     override fun updateApplication(cid: String, jid: String, aid: String, application: Application) {

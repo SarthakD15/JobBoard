@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class ReviewController(var reviewService: ReviewService){
 
     @GetMapping("/allreviews/{companyId}")
-    fun getAllReviews(@PathVariable companyId: String)=reviewService.getAllReviews(companyId)
+    fun getAllReviews(@PathVariable companyId: String): List<ReviewDto> = reviewService.getAllReviews(companyId)
 
     @PostMapping("/reviews/{companyId}")
     @PreAuthorize("hasAuthority('USER')")

@@ -1,6 +1,7 @@
 package com.jobapplication.example.jobapplication.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jobapplication.example.jobapplication.applications.Application;
 import com.jobapplication.example.jobapplication.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -40,6 +41,17 @@ public class UserEntity {
     @OneToOne(mappedBy = "userEntity")
 //    @JsonIgnoreProperties("userEntity")
     private Company company;
+
+//    @OneToOne(mappedBy = "userEntity")
+//    private Application application;
+//
+//    public Application getApplication() {
+//        return application;
+//    }
+//
+//    public void setApplication(Application application) {
+//        this.application = application;
+//    }
 
     public Company getCompany() {
         return company;

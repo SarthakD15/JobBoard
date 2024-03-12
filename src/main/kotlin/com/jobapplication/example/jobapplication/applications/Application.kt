@@ -5,6 +5,7 @@ import com.jobapplication.example.jobapplication.company.CompanyDto
 import com.jobapplication.example.jobapplication.job.Job
 import com.jobapplication.example.jobapplication.job.JobDto
 import com.jobapplication.example.jobapplication.review.ReviewDto
+import com.jobapplication.example.jobapplication.security.UserEntity
 import jakarta.persistence.*
 
 @Entity
@@ -21,6 +22,10 @@ data class Application (
     @JoinColumn(name = "job_id")
     var job : Job?=null
 
+////    @OneToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "user_id")
+//    var userEntity:UserEntity?=null
+////
     fun toDTO(): ApplicationDto {
         return ApplicationDto(
                 id = id,

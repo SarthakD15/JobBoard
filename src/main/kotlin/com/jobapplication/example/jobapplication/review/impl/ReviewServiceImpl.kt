@@ -4,6 +4,7 @@ import com.jobapplication.example.jobapplication.company.Company
 import com.jobapplication.example.jobapplication.company.CompanyRepository
 import com.jobapplication.example.jobapplication.company.CompanyService
 import com.jobapplication.example.jobapplication.review.Review
+import com.jobapplication.example.jobapplication.review.ReviewDto
 import com.jobapplication.example.jobapplication.review.ReviewRepository
 import com.jobapplication.example.jobapplication.review.ReviewService
 import org.springframework.stereotype.Service
@@ -11,8 +12,8 @@ import java.util.UUID
 
 @Service
 class ReviewServiceImpl(var reviewRepository: ReviewRepository, var companyService: CompanyService, var companyRepository: CompanyRepository) : ReviewService {
-    override fun getAllReviews(companyId: String): List<Review> {
-        return reviewRepository.findByCompanyId(companyId)
+    override fun getAllReviews(companyId: String): List<ReviewDto> {
+        return reviewRepository.findByCompanyId(companyId).map { it.toDTOForCompany() }
     }
 
     override fun addReview(id: String, review: Review):Boolean {
