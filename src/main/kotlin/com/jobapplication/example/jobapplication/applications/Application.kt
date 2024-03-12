@@ -22,9 +22,9 @@ data class Application (
     @JoinColumn(name = "job_id")
     var job : Job?=null
 
-////    @OneToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
-//    var userEntity:UserEntity?=null
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    var userEntity:UserEntity?=null
 ////
     fun toDTO(): ApplicationDto {
         return ApplicationDto(

@@ -9,7 +9,12 @@ interface ApplicationRepository : JpaRepository<Application,String> {
 
 
     @Query(nativeQuery = true, value = "SELECT * FROM job_board.application where job_id=?1 AND user_id = ?2")
-    fun findApplication(jid: String, uid: Int) : Application?
+    fun findByApplication(jid: String, uid: Int) : Application
+
+    @Query(nativeQuery = true, value = "SELECT * FROM job_board.application where user_id = ?1")
+    fun findByUser(uid: Int) : List<Application>
+
+
 
 
 }

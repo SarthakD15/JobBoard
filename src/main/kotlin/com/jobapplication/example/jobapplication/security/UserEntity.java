@@ -42,16 +42,16 @@ public class UserEntity {
 //    @JsonIgnoreProperties("userEntity")
     private Company company;
 
-//    @OneToOne(mappedBy = "userEntity")
-//    private Application application;
-//
-//    public Application getApplication() {
-//        return application;
-//    }
-//
-//    public void setApplication(Application application) {
-//        this.application = application;
-//    }
+    @OneToMany(mappedBy = "userEntity")
+    private List<Application> application;
+
+    public List<Application> getApplication() {
+        return application;
+    }
+
+    public void setApplication(List<Application> application) {
+        this.application = application;
+    }
 
     public Company getCompany() {
         return company;

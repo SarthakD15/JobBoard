@@ -18,7 +18,13 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, var userRepository: UserRepository, var companyRepository: CompanyRepository,var emailService: EmailService):ApplicationService {
+class ApplicationServiceImpl(
+        var applicationRepository: ApplicationRepository,
+        var userRepository: UserRepository,
+        var companyRepository: CompanyRepository,
+        var emailService: EmailService
+
+):ApplicationService {
     override fun getAllApplications(cid:String, jid:String): ResponseEntity<List<ApplicationDto>> {
         var companypassed : Company = companyRepository.findById(cid).orElseThrow{RuntimeException("Company Not found")}
         var userID = companypassed.userEntity?.id
@@ -42,9 +48,28 @@ class ApplicationServiceImpl(var applicationRepository: ApplicationRepository, v
         val username = authentication.name
         println(username)
         var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+//        val application: Application = applicationRepository.findByApplication(id,completeuser.id);
+//        if(){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nope")
+//        }
 
-        application.id= UUID.randomUUID().toString()
+        var applications : List<Application> = applicationRepository.findByUser(completeuser.id)
+        for (it in applications){
+            val jobid = it.job?.id
+            if(jobid == id){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nope")
+            }
+        }
+
+        application?.id= UUID.randomUUID().toString()
         applicationRepository.save(application)
+        userRepository.save(completeuser)
+
+        completeuser.application.addLast(application)
+        application.userEntity = completeuser
+
+        applicationRepository.save(application)
+        userRepository.save(completeuser)
 
         val emailDetails = EmailDetails(completeuser.email, "Thank you for applying", "We have received your application")
         emailService.sendSimpleMail(emailDetails)
