@@ -15,9 +15,9 @@ class JobServiceImpl (var jobRepository: JobRepository, var companyRepository: C
         return jobRepository.findAll().map { it.toDTOForJob() }
     }
 
-    override fun createJob(id:String, job: Job) {
+    override fun createJob(id:String, job: Job):String {
         println(job)
-        job.id= UUID.randomUUID().toString()
+        job.id= UUID.randomUUID().toString().replace("-","").substring(0,12)
         var company_id = job.company?.id
         println(company_id)
         val companyjob = company_id?.let { companyRepository.findById(it).orElseThrow{RuntimeException("Company not found")} }
@@ -31,13 +31,15 @@ class JobServiceImpl (var jobRepository: JobRepository, var companyRepository: C
         if (companyjob != null) {
             companyRepository.save(companyjob)
         }
+
+        return "Job created"
     }
 
     override fun getJobById(id: String):Job {
         return jobRepository.findById(id).orElseThrow{RuntimeException("Job not found")}
     }
 
-    override fun updateJob(id: String, updatedJob: Job) {
+    override fun updateJob(id: String, updatedJob: Job):String {
         val oldJob = jobRepository.findById(id).orElseThrow{RuntimeException("Job not found")}
         oldJob.title= updatedJob.title
         oldJob.description= updatedJob.description
@@ -45,11 +47,12 @@ class JobServiceImpl (var jobRepository: JobRepository, var companyRepository: C
         oldJob.maxSalary= updatedJob.maxSalary
         oldJob.location= updatedJob.location
         jobRepository.save(oldJob)
+
+        return "Job updated"
     }
 
-    override fun deleteJob(id: String) {
+    override fun deleteJob(id: String){
         val oldJob = jobRepository.findById(id).orElseThrow{RuntimeException("Job not found")}
         return jobRepository.delete(oldJob)
-
     }
 }

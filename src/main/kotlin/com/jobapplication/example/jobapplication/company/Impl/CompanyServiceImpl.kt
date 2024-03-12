@@ -43,7 +43,8 @@ class CompanyServiceImpl(var companyRepository: CompanyRepository,var userReposi
         if(completeuser.company!=null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already has a company. Cannot create another.")
         }
-        company.id= UUID.randomUUID().toString()
+        company.id= UUID.randomUUID().toString().replace("-","").substring(0,12)
+//        company.id= UUID.randomUUID().toString().replace("-","").substring(0,8)
         userRepository.save(completeuser)
         companyRepository.save(company)
 
@@ -55,11 +56,13 @@ class CompanyServiceImpl(var companyRepository: CompanyRepository,var userReposi
         return ResponseEntity.status(HttpStatus.OK).body("Company created")
     }
 
-    override fun updateCompany(company: Company, id: String) {
+    override fun updateCompany(company: Company, id: String):String {
         val oldCompany = companyRepository.findById(id).orElseThrow{RuntimeException("Company not found")}
         oldCompany.title=company.title
         oldCompany.description=company.description
         companyRepository.save(oldCompany)
+
+        return "company updated"
     }
 
     override fun deleteCompanyById(id: String): String {

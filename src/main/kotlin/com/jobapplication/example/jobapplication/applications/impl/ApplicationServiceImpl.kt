@@ -57,11 +57,11 @@ class ApplicationServiceImpl(
         for (it in applications){
             val jobid = it.job?.id
             if(jobid == id){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nope")
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have already applied for this job")
             }
         }
 
-        application?.id= UUID.randomUUID().toString()
+        application?.id= UUID.randomUUID().toString().replace("-","").substring(0,12)
         applicationRepository.save(application)
         userRepository.save(completeuser)
 

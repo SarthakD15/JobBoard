@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.jobapplication.example.jobapplication.company.CompanyDto
 import com.jobapplication.example.jobapplication.job.Job
 import com.jobapplication.example.jobapplication.job.JobDto
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 import lombok.Data
 
 @Data
 data class ApplicationDto (
+        @Id
         var id: String?,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         var name: String?,

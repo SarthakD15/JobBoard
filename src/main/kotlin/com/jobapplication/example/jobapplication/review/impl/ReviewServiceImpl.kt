@@ -17,7 +17,7 @@ class ReviewServiceImpl(var reviewRepository: ReviewRepository, var companyServi
     }
 
     override fun addReview(id: String, review: Review):Boolean {
-        review.id= UUID.randomUUID().toString()
+        review.id= UUID.randomUUID().toString().replace("-","").substring(0,12)
         var getcompany = companyService.getCompanyById(id)
         if (getcompany!=null){
             review.company= getcompany
