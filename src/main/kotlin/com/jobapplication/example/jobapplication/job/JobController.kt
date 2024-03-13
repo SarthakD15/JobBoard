@@ -25,12 +25,12 @@ class JobController(val jobService: JobService) {
     @PreAuthorize("hasAuthority('ADMIN')")
     fun getJobById(@PathVariable id:String)=jobService.getJobById(id)
 
-    @DeleteMapping("/jobs/{id}")
+    @DeleteMapping("/jobs/{cid}/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun deleteJob(@PathVariable id:String)=jobService.deleteJob(id)
+    fun deleteJob(@PathVariable cid:String, @PathVariable id:String)=jobService.deleteJob(cid, id)
 
-    @PutMapping("/jobs/{id}")
+    @PutMapping("/jobs/{cid}/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun updateJob(@PathVariable id:String, @RequestBody updatedjob:Job)=jobService.updateJob(id,updatedjob)
+    fun updateJob(@PathVariable cid: String, @PathVariable id:String, @RequestBody updatedjob:Job)=jobService.updateJob(cid, id,updatedjob)
 
 }

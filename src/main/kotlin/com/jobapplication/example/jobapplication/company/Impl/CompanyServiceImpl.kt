@@ -56,19 +56,33 @@ class CompanyServiceImpl(var companyRepository: CompanyRepository,var userReposi
         return ResponseEntity.status(HttpStatus.OK).body("Company created")
     }
 
-    override fun updateCompany(company: Company, id: String):String {
+    override fun updateCompany(company: Company, id: String):ResponseEntity<String> {
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+
+        var companies : List<Company> = companyRepository.findByCompany(id)
+        for (it in companies){
+            var userid = it.userEntity?.id
+            if(completeuser.id != userid){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are not the admin of this company")
+            }
+
+        }
         val oldCompany = companyRepository.findById(id).orElseThrow{RuntimeException("Company not found")}
         oldCompany.title=company.title
         oldCompany.description=company.description
         companyRepository.save(oldCompany)
 
-        return "company updated"
+        return ResponseEntity.status(HttpStatus.OK).body("Company updated")
     }
 
-    override fun deleteCompanyById(id: String): String {
+    override fun deleteCompanyById(id: String): ResponseEntity<String> {
         val oldCompany = companyRepository.findById(id).orElseThrow{RuntimeException("Company not found")}
         companyRepository.delete(oldCompany)
-        return "company deleted"
+
+        return ResponseEntity.status(HttpStatus.OK).body("Company deletd")
     }
 
     override fun getCompanyById(id: String): Company {

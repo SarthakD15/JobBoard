@@ -48,10 +48,6 @@ class ApplicationServiceImpl(
         val username = authentication.name
         println(username)
         var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
-//        val application: Application = applicationRepository.findByApplication(id,completeuser.id);
-//        if(){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nope")
-//        }
 
         var applications : List<Application> = applicationRepository.findByUser(completeuser.id)
         for (it in applications){
@@ -76,25 +72,55 @@ class ApplicationServiceImpl(
         return ResponseEntity.status(HttpStatus.OK).body("Application sent")
     }
 
-    override fun updateApplication(cid: String, jid: String, aid: String, application: Application) {
+    override fun updateApplication(cid: String, jid: String, aid: String, application: Application):ResponseEntity<String> {
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+
+        var applications : List<Application> = applicationRepository.findByJob(jid)
+        println(applications)
+        for (it in applications){
+            val userid = it.userEntity?.id
+            if(userid != completeuser.id){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't access this application")
+            }
+        }
+
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         oldApplication.name=application.name
         oldApplication.edu=application.edu
         oldApplication.coverLetter=application.coverLetter
         applicationRepository.save(oldApplication)
+
+        return ResponseEntity.status(HttpStatus.OK).body("Application updated")
     }
 
-    override fun deleteApplicationById(cid: String, jid: String, aid:String): String {
+    override fun deleteApplicationById(cid: String, jid: String, aid:String): ResponseEntity<String> {
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        println(username)
+        var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
+
+        var applications : List<Application> = applicationRepository.findByJob(jid)
+        for (it in applications){
+            val userid = it.userEntity?.id
+            if(userid != completeuser.id){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't access this application")
+            }
+        }
+
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         applicationRepository.delete(oldApplication)
-        return "Application Deleted"
+
+        return ResponseEntity.status(HttpStatus.OK).body("Application deleted")
     }
 
     override fun getApplicationById(cid: String, jid: String, aid:String): Application {
         return applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
     }
 
-    override fun acceptApplication(cid: String, jid: String, aid: String): String {
+    override fun acceptApplication(cid: String, jid: String, aid: String): ResponseEntity<String> {
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         oldApplication.status=true
         applicationRepository.save(oldApplication)
@@ -104,12 +130,13 @@ class ApplicationServiceImpl(
         var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
         println(completeuser)
 
-        val emailDetails = EmailDetails(completeuser.email, "Application approved", "Congrats")
+        val emailDetails = EmailDetails(completeuser.email, "Application approved", "Congrats, your application got selected. Someone from the HR team will soon reach out to you")
         emailService.sendSimpleMail(emailDetails)
-        return "Application Accepted"
+
+        return ResponseEntity.status(HttpStatus.OK).body("Application accepted")
     }
 
-    override fun rejectApplication(cid: String, jid: String, aid: String): String {
+    override fun rejectApplication(cid: String, jid: String, aid: String): ResponseEntity<String> {
         val oldApplication = applicationRepository.findById(aid).orElseThrow{RuntimeException("Application Not found")}
         oldApplication.status=false
         applicationRepository.save(oldApplication)
@@ -118,9 +145,10 @@ class ApplicationServiceImpl(
         var completeuser : UserEntity = userRepository.findByUsername(username).orElseThrow{RuntimeException("User not found")}
         println(completeuser)
 
-        val emailDetails = EmailDetails(completeuser.email, "Application rejected", "Sorry")
+        val emailDetails = EmailDetails(completeuser.email, "Application Update", "Sorry, the hiring manager has chosen to move forward with another candidate ")
         emailService.sendSimpleMail(emailDetails)
-        return "Application Rejected"
+
+        return ResponseEntity.status(HttpStatus.OK).body("Application rejected")
     }
 
 //    override fun getApplicationsforuser(id:String,cid: String,jid: String): List<ApplicationDto>{
